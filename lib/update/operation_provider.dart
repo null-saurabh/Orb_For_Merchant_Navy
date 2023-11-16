@@ -13,10 +13,11 @@ class OperationProvider extends ChangeNotifier {
     return _operations.where((operation) => operation.tankId == tankId).toList();
   }
 
-  void addNewOperation({required int tankId,required String operationFunctionName, required double operationFunctionValue, required List<Tank> allInitialTankData, required List<Tank> allFinalTankData,required bool isTargetTank, String? targetTankName}){
+  void addNewOperation({required int tankId,required String tankName,required String operationFunctionName, required double operationFunctionValue, required List<Tank> allInitialTankData, required List<Tank> allFinalTankData,required bool isTargetTank, String? targetTankName}){
     Operation newOperation = Operation(
         operationId: _operations.length,
         tankId: tankId,
+        tankName: tankName,
         operationFunctionName: operationFunctionName,
         operationFunctionValue: operationFunctionValue,
         isTargetTank: isTargetTank,
@@ -37,25 +38,27 @@ class OperationProvider extends ChangeNotifier {
       Operation operationToEdit = _operations[index];
 
       // Perform the edited operation and get the updated tank data
-      List<Tank> editedOperationTankData = performEditedOperation(
+      List<Tank> editedOperationAllTankData = performEditedOperation(
           allInitialTankData: operationToEdit.allInitialTankData,
           tankId: operationToEdit.tankId,
+          tankName: operationToEdit.tankName,
           operationFunctionName: newOperationFunctionName,
           operationFunctionValue: newOperationFunctionValue,
           targetTankName: newOperationFunctionName.contains("To") ? newOperationFunctionName.replaceFirst("To ",""):null,
       );
 
-      lastFinalTankData = editedOperationTankData;
+      lastFinalTankData = editedOperationAllTankData;
 
       // Update the edited operation
       Operation newEditedOperation = Operation(
           operationId: operationToEdit.operationId,
           tankId: operationToEdit.tankId,
+          tankName: operationToEdit.tankName,
           operationFunctionName: newOperationFunctionName,
           operationFunctionValue: newOperationFunctionValue,
           isTargetTank: newOperationFunctionName.contains("To")? true:false,
           allInitialTankData: operationToEdit.allInitialTankData,
-          allFinalTankData: editedOperationTankData,
+          allFinalTankData: editedOperationAllTankData,
           targetTankName: newOperationFunctionName.contains("To") ? newOperationFunctionName.replaceFirst("To ",""):null
       );
 
@@ -63,13 +66,15 @@ class OperationProvider extends ChangeNotifier {
       updateEditedOperation(operationId: operationId, newOperationData: newEditedOperation);
 
       // Iterate through subsequent operations and update them
-      for (int i = index + 1; i < _operations.length; i++) {
 
+      for (int i = index + 1; i < _operations.length; i++) {
+        print("inside loop");
         Operation subsequentOperation = _operations[i];
 
-        List<Tank> updatedTankData = performEditedOperation(
+        List<Tank> updatedAllTankData = performEditedOperation(
           allInitialTankData: lastFinalTankData,
           tankId: subsequentOperation.tankId,
+          tankName: subsequentOperation.tankName,
           operationFunctionName: subsequentOperation.operationFunctionName,
           operationFunctionValue: subsequentOperation.operationFunctionValue,
           targetTankName: subsequentOperation.operationFunctionName.contains("To") ? subsequentOperation.operationFunctionName.replaceFirst("To ", "") : null,
@@ -79,20 +84,19 @@ class OperationProvider extends ChangeNotifier {
         Operation updatedOperation = Operation(
           operationId: subsequentOperation.operationId,
           tankId: subsequentOperation.tankId,
+          tankName: subsequentOperation.tankName,
           operationFunctionName: subsequentOperation.operationFunctionName,
           operationFunctionValue: subsequentOperation.operationFunctionValue,
           isTargetTank: subsequentOperation.operationFunctionName.contains("To") ? true : false,
           allInitialTankData: lastFinalTankData,
-          allFinalTankData: updatedTankData,
+          allFinalTankData: updatedAllTankData,
           targetTankName: subsequentOperation.operationFunctionName.contains("To") ? subsequentOperation.operationFunctionName.replaceFirst("To ", "") : null,
         );
 
-        // Update the subsequent operation in the list
         updateEditedOperation(operationId: subsequentOperation.operationId, newOperationData: updatedOperation);
 
-        lastFinalTankData = updatedTankData;
+        lastFinalTankData = updatedAllTankData;
       }
-
       tankProvider.updateAllTanks(lastFinalTankData);
     }
   }
@@ -102,11 +106,13 @@ class OperationProvider extends ChangeNotifier {
   List<Tank> performEditedOperation({
     required List<Tank> allInitialTankData,
     required int tankId,
+    required String tankName,
     required String operationFunctionName,
     required double operationFunctionValue,
     String? targetTankName,
 }){
     int index = allInitialTankData.indexWhere((tank) => tank.tankId == tankId);
+    print("rob before operation" +allInitialTankData[index].currentROB.toString());
 
     if (operationFunctionName == "Manual Addition" || operationFunctionName == "Daily Collection/Generation" ||operationFunctionName == "From Engine Room Bilge Well") {
       allInitialTankData[index].currentROB += operationFunctionValue;
@@ -119,7 +125,7 @@ class OperationProvider extends ChangeNotifier {
       allInitialTankData[index].currentROB -= operationFunctionValue;
       allInitialTankData[targetIndex].currentROB += operationFunctionValue;
     }
-
+    print("rob after operation" +allInitialTankData[index].currentROB.toString());
     return allInitialTankData;
   }
 

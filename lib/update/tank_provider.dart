@@ -4,7 +4,7 @@ import 'package:orb/update/operation_provider.dart';
 
 class TankProvider extends ChangeNotifier {
 
-  final List<Tank> _tanks = [];
+  List<Tank> _tanks = [];
   List<Tank> get allTanks => _tanks;
 
   void addTank({required Tank tankData}) {
@@ -17,8 +17,6 @@ class TankProvider extends ChangeNotifier {
     if (index != -1) {
       _tanks[index] = editedTankData;
       notifyListeners();
-    }else {
-      print('Tank with id $tankId not found');
     }
   }
 
@@ -32,14 +30,13 @@ class TankProvider extends ChangeNotifier {
     if (index != -1) {
       _tanks[index].tankFunctions = functions;
       notifyListeners();
-    } else {
-      print('Tank with id $tankId not found');
     }
   }
 
   void updateAllTanks(List<Tank> newTanks) {
-    _tanks.clear();
-    _tanks.addAll(newTanks);
+    if (newTanks.isNotEmpty) {
+      _tanks = List.from(newTanks);
+    }
     notifyListeners();
   }
 
@@ -53,32 +50,50 @@ class TankProvider extends ChangeNotifier {
     String? targetTankName,
   }) {
 
-    List<Tank> allInitialTankData = _tanks;
+    // List<Tank> allInitialTankData = _tanks;
+    // List<Tank> allInitialTankData = _tanks.map((tank) => Tank.copy(tank)).toList();
+
+    List<Tank> allInitialTankData = _tanks.map((tank) {
+      return Tank(
+        tankId: tank.tankId,
+        tankName: tank.tankName,
+        currentROB: tank.currentROB,
+        totalCapacity: tank.totalCapacity,
+        tankType: tank.tankType,
+        tankFunctions: tank.tankFunctions
+      );
+    }).toList();
+
 
     int index = _tanks.indexWhere((tank) => tank.tankId == tankId);
     if (index != -1) {
       Tank tank = _tanks[index];
 
+      // print("provider rob before operation"+tank.currentROB.toString());
       if (arithmeticExpression == "add") {
-
         tank.currentROB += operationFunctionValue;
-
         operationProvider.addNewOperation(
             tankId: tankId,
+            tankName: tank.tankName,
             operationFunctionName: operationFunctionName,
             operationFunctionValue: operationFunctionValue,
             allInitialTankData: allInitialTankData,
             allFinalTankData:_tanks,
             isTargetTank: isTransfer
         );
-
+        // print("provider rob after operation"+tank.currentROB.toString());
+        // print(_tanks[_tanks.indexWhere((tank) => tank.tankId == tankId)].currentROB.toString() + "tank rob");
+        // print(allInitialTankData[allInitialTankData.indexWhere((tank) => tank.tankId == tankId)].currentROB.toString() + "initialData Rob");
       }
+
+
 
       else if (arithmeticExpression == "sub") {
 
         tank.currentROB -= operationFunctionValue;
 
         operationProvider.addNewOperation(tankId: tankId,
+            tankName: tank.tankName,
             operationFunctionName: operationFunctionName,
             operationFunctionValue: operationFunctionValue,
             allInitialTankData: allInitialTankData,
@@ -96,6 +111,7 @@ class TankProvider extends ChangeNotifier {
 
           operationProvider.addNewOperation(
               tankId: tankId,
+              tankName: tank.tankName,
               operationFunctionName: operationFunctionName,
               operationFunctionValue: operationFunctionValue,
               allInitialTankData: allInitialTankData,
@@ -107,8 +123,6 @@ class TankProvider extends ChangeNotifier {
           }
 
       notifyListeners();
-    } else {
-      print('Tank with id $tankId not found');
     }
   }
 

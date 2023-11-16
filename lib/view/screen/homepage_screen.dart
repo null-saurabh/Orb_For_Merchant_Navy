@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:orb/update/tank_provider.dart';
+import 'package:orb/view/screen/book_screen.dart';
 import 'package:orb/view/widgets/homepage_widgets/tank_ui.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +18,13 @@ class _HomePageScreenState extends State<HomePageScreen> {
       appBar: AppBar(
         elevation: 5,
         title: const Text("ORB"),
+        actions: [IconButton(icon: const Icon(Icons.menu_book_outlined),onPressed: (){
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const BookScreen(),
+            ),
+          );
+        },),]
       ),
       body: Consumer<TankProvider>(builder: (context,provider,_){
         return GridView.builder(

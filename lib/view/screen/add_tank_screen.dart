@@ -52,6 +52,7 @@ class AddTankScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text("Max Capacity: ${provider.allTanks[index].totalCapacity} m³"),
+                      Text("Initial Rob: ${provider.allTanks[index].currentROB} m³"),
                       Text("Tank Type: ${provider.allTanks[index].tankType}"),
                     ],
                   ),

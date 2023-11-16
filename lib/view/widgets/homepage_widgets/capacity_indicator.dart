@@ -9,12 +9,12 @@ class CapacityIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    double percentage = (currentCapacity / totalCapacity) * 100;
+    double percentage = (currentCapacity / totalCapacity).clamp(0.0, 1.0);
 
     Color barColor;
-    if (percentage >= 90) {
+    if (percentage >= 0.9) {
       barColor = Colors.red;
-    } else if (percentage >= 85) {
+    } else if (percentage >= 0.85) {
       barColor = Colors.yellow;
     }else {
       barColor = Colors.green;  // water blue
@@ -31,12 +31,14 @@ class CapacityIndicator extends StatelessWidget {
       child: Stack(
         alignment: Alignment.bottomCenter, // This ensures the colored bar starts from the bottom
         children: <Widget>[
-          Container(
-            decoration: BoxDecoration(
-              color: barColor,
-              borderRadius: BorderRadius.circular(0),
+          FractionallySizedBox(
+            heightFactor: percentage,
+            child: Container(
+              decoration: BoxDecoration(
+                color: barColor,
+                borderRadius: BorderRadius.circular(0),
+              ),
             ),
-            height: 200 * (percentage / 100),  // adjust the height of this container based on the percentage
           ),
         ],
       ),
