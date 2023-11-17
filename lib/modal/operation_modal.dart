@@ -23,8 +23,3 @@ class Operation {
     this.targetTankName
   });
 }
-
-//condition before perform operation like max capacity
-// same name ka 2 tank nhi hoga
-//only number keyboard
-//decimal upto 2 digit

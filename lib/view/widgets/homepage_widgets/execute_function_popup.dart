@@ -70,6 +70,11 @@ class _ExecuteFunctionPopUpState extends State<ExecuteFunctionPopUp> {
                 if (value == null || value.isEmpty) {
                   return 'Please enter value';
                 }
+                double? values = double.tryParse(value);
+                if (values == null || values< 0) {
+                  return 'Please enter a valid non-negative number for Initial ROB';
+                }
+
                 return null;
               },
             ),
@@ -80,7 +85,7 @@ class _ExecuteFunctionPopUpState extends State<ExecuteFunctionPopUp> {
                 if (_formKey.currentState!.validate()) {
                     OperationProvider operationProvider = Provider.of<OperationProvider>(context, listen: false);
 
-                    Provider.of<TankProvider>(context, listen: false).performNewFunction(
+                    bool success = Provider.of<TankProvider>(context, listen: false).performNewFunction(
                         tankId: widget.tank.tankId,
                         operationFunctionName: widget.functionName,
                         operationFunctionValue: double.tryParse(valueController.text) ?? 0,
@@ -90,6 +95,14 @@ class _ExecuteFunctionPopUpState extends State<ExecuteFunctionPopUp> {
                         operationProvider:operationProvider);
 
                     Navigator.pop(context);
+
+                    if (!success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Operation not allowed. Please allocate operations to all tanks before proceeding."),
+                        ),
+                      );
+                    }
                 }
               },
               style: ButtonStyle(

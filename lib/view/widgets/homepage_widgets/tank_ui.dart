@@ -130,7 +130,7 @@ class _TankUiState extends State<TankUi> {
                     children: [
                       Text("Cap: ${widget.tank.totalCapacity}"),
                       Expanded(child: CapacityIndicator(totalCapacity: widget.tank.totalCapacity, currentCapacity: widget.tank.currentROB)),
-                      Text("ROB: ${widget.tank.currentROB}"),
+                      Text("ROB: ${widget.tank.currentROB.toStringAsFixed(2)}"),
 
                     ],
                   )

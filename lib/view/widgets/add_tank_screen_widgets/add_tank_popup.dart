@@ -90,10 +90,15 @@ class _AddTankPopUpState extends State<AddTankPopUp> {
                 if (value == null || value.isEmpty) {
                   return 'Please enter tank Capacity';
                 }
+                double? capacity = double.tryParse(value);
+                if (capacity == null || capacity <= 0) {
+                  return 'Please enter a valid positive number for Max Capacity';
+                }
                 return null;
               },
             ),
             const SizedBox(height: 20),
+
             TextFormField(
               controller: tankRobController,
               keyboardType: TextInputType.number, // for number input
@@ -115,6 +120,18 @@ class _AddTankPopUpState extends State<AddTankPopUp> {
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter Initial Tank ROB';
+                }
+                double? rob = double.tryParse(value);
+                if (rob == null || rob < 0) {
+                  return 'Please enter a valid non-negative number for Initial ROB';
+                }
+                double? maxCapacity = double.tryParse(tankCapacityController.text);
+                if (maxCapacity == null) {
+                  return 'Please enter a valid number for Max Capacity first';
+                }
+
+                if (rob > maxCapacity) {
+                  return 'Initial ROB must be less than or equal to Max Capacity';
                 }
                 return null;
               },
@@ -164,8 +181,15 @@ class _AddTankPopUpState extends State<AddTankPopUp> {
                   );
 
                   if(widget.editTank == false){
-                    Provider.of<TankProvider>(context, listen: false)
+                    bool success = Provider.of<TankProvider>(context, listen: false)
                         .addTank(tankData: tank);
+                    if (!success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text("Tank name already exists!"),
+                        ),
+                      );
+                    }
                   }
                   else {
                     Provider.of<TankProvider>(context, listen: false)
