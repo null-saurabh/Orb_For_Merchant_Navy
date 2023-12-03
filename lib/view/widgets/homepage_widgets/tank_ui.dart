@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:orb/modal/operation_modal.dart';
 import 'package:orb/modal/tank_modal.dart';
 import 'package:orb/update/operation_provider.dart';
+import 'package:orb/update/tank_provider.dart';
+import 'package:orb/view/widgets/book_screen_widgets/edit_book_popup.dart';
 import 'package:orb/view/widgets/homepage_widgets/capacity_indicator.dart';
 import 'package:orb/view/widgets/homepage_widgets/execute_function_popup.dart';
 import 'package:provider/provider.dart';
@@ -61,8 +63,28 @@ class _TankUiState extends State<TankUi> {
                                   return ListView.builder(
                                     itemCount: operationsForThisTank.length,
                                     itemBuilder: (context, index) {
-                                      return Text(
-                                        "${index + 1}. ${operationsForThisTank[index].operationFunctionName}: ${operationsForThisTank[index].operationFunctionValue}",
+                                      return Row(
+                                        children: [
+                                          Text(
+                                            "${index + 1}. ${operationsForThisTank[index].operationFunctionName}: ${operationsForThisTank[index].operationFunctionValue}",
+                                          ),
+                                          IconButton(icon:  const Icon(Icons.edit),onPressed: (){
+
+                                            Tank tankData = Provider.of<TankProvider>(context, listen: false)
+                                                .allTanks
+                                                .firstWhere((tank) => tank.tankId == operationsForThisTank[index].tankId);
+
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) => EditBookPopUp(
+                                                tankData: tankData,
+                                                operationId: operationsForThisTank[index].operationId,
+                                                operationFunctionValue: operationsForThisTank[index].operationFunctionValue,
+                                                operationFunctionName: operationsForThisTank[index].operationFunctionName,
+                                              ),
+                                            );
+                                          })
+                                        ],
                                       );
                                     },
                                   );

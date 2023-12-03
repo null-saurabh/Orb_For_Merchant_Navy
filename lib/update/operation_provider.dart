@@ -29,6 +29,7 @@ class OperationProvider extends ChangeNotifier {
     _operations.add(newOperation);
   }
 
+
   void editOperation({required TankProvider tankProvider,required int operationId, required String newOperationFunctionName, required double newOperationFunctionValue}){
 
     int index = _operations.indexWhere((operation) => operation.operationId == operationId);
@@ -62,13 +63,14 @@ class OperationProvider extends ChangeNotifier {
           targetTankName: newOperationFunctionName.contains("To") ? newOperationFunctionName.replaceFirst("To ",""):null
       );
 
+
       // Update the edited operation in the list
       updateEditedOperation(operationId: operationId, newOperationData: newEditedOperation);
 
-      // Iterate through subsequent operations and update them
 
+      // Iterate through subsequent operations and update them
       for (int i = index + 1; i < _operations.length; i++) {
-        print("inside loop");
+
         Operation subsequentOperation = _operations[i];
 
         List<Tank> updatedAllTankData = performEditedOperation(
@@ -94,7 +96,6 @@ class OperationProvider extends ChangeNotifier {
         );
 
         updateEditedOperation(operationId: subsequentOperation.operationId, newOperationData: updatedOperation);
-
         lastFinalTankData = updatedAllTankData;
       }
       tankProvider.updateAllTanks(lastFinalTankData);
@@ -111,22 +112,35 @@ class OperationProvider extends ChangeNotifier {
     required double operationFunctionValue,
     String? targetTankName,
 }){
-    int index = allInitialTankData.indexWhere((tank) => tank.tankId == tankId);
-    print("rob before operation" +allInitialTankData[index].currentROB.toString());
+
+    List<Tank> updatedTankData = allInitialTankData.map((tank) {
+      return Tank(
+        tankId: tank.tankId,
+        tankName: tank.tankName,
+        currentROB: tank.currentROB,
+        totalCapacity: tank.totalCapacity,
+        tankType: tank.tankType,
+        tankFunctions: tank.tankFunctions != null ? [...tank.tankFunctions!] : null,
+      );
+    }).toList();
+
+
+    int index = updatedTankData.indexWhere((tank) => tank.tankId == tankId);
+    // print("rob before operation" +allInitialTankData[index].currentROB.toString());
 
     if (operationFunctionName == "Manual Addition" || operationFunctionName == "Daily Collection/Generation" ||operationFunctionName == "From Engine Room Bilge Well") {
-      allInitialTankData[index].currentROB += operationFunctionValue;
+      updatedTankData[index].currentROB += operationFunctionValue;
     }
     else if (operationFunctionName == "Evaporation" || operationFunctionName == "Shore Disposal" ||operationFunctionName == "Incinerated" ||operationFunctionName == "Ows Overboard") {
-      allInitialTankData[index].currentROB -= operationFunctionValue;
+      updatedTankData[index].currentROB -= operationFunctionValue;
     }
     else{
-      int targetIndex = allInitialTankData.indexWhere((tank) => tank.tankName == targetTankName);
-      allInitialTankData[index].currentROB -= operationFunctionValue;
-      allInitialTankData[targetIndex].currentROB += operationFunctionValue;
+      int targetIndex = updatedTankData.indexWhere((tank) => tank.tankName == targetTankName);
+      updatedTankData[index].currentROB -= operationFunctionValue;
+      updatedTankData[targetIndex].currentROB += operationFunctionValue;
     }
-    print("rob after operation" +allInitialTankData[index].currentROB.toString());
-    return allInitialTankData;
+    // print("rob after operation" +allInitialTankData[index].currentROB.toString());
+    return updatedTankData;
   }
 
 
