@@ -1,7 +1,7 @@
 import 'package:orb/modal/tank_modal.dart';
 
 class Operation {
-  final int operationId;
+  int operationId;
   final int tankId;
   final String tankName;
   final String operationFunctionName;
@@ -11,7 +11,7 @@ class Operation {
   final List<Tank> allFinalTankData;
   final String? targetTankName;
 
-  const Operation({
+  Operation({
     required this.operationId,
     required this.tankId,
     required this.tankName,

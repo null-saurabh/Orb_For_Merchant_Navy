@@ -83,7 +83,13 @@ class _TankUiState extends State<TankUi> {
                                                 operationFunctionName: operationsForThisTank[index].operationFunctionName,
                                               ),
                                             );
-                                          })
+                                          }),
+                                          IconButton(icon:  const Icon(Icons.delete),onPressed: (){
+
+                                            TankProvider tankProvider = Provider.of<TankProvider>(context,listen: false);
+                                            Provider.of<OperationProvider>(context,listen: false).deleteOperation(
+                                                operationId: operationsForThisTank[index].operationId, tankProvider: tankProvider);
+                                          }),
                                         ],
                                       );
                                     },
