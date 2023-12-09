@@ -15,6 +15,29 @@ class Tank {
     required this.totalCapacity
   });
 
+  factory Tank.fromJson(Map<String, dynamic> json) {
+    return Tank(
+      tankId: json['tankId'],
+      tankName: json['tankName'],
+      currentROB: json['currentROB'],
+      tankFunctions: json['tankFunctions'] != null
+          ? List<String>.from(json['tankFunctions'])
+          : null,
+      tankType: json['tankType'],
+      totalCapacity: json['totalCapacity'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'tankId': tankId,
+      'tankName': tankName,
+      'currentROB': currentROB,
+      'tankFunctions': tankFunctions,
+      'tankType': tankType,
+      'totalCapacity': totalCapacity,
+    };
+  }
 
 
 }

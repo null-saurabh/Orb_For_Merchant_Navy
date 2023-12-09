@@ -12,6 +12,14 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
+
+  @override
+  void initState() {
+    TankProvider tankProvider = TankProvider();
+    tankProvider.initializeTanksFromPreferences();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,16 +35,28 @@ class _HomePageScreenState extends State<HomePageScreen> {
         },),]
       ),
       body: Consumer<TankProvider>(builder: (context,provider,_){
-        return GridView.builder(
-            padding:
-            const EdgeInsets.symmetric(vertical: 20, horizontal: 5),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10),
-            itemCount: provider.allTanks.length,itemBuilder: (context,index){
-          return TankUi(tank: provider.allTanks[index]);
-        });
+        print(provider.allTanks.length);
+        print(Provider.of<TankProvider>(context).allTanks.length);
+        return Row(
+          children: [
+            Flexible(
+              flex: 4,
+              child: GridView.builder(
+                  padding:
+                  const EdgeInsets.symmetric(vertical: 20, horizontal: 5),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 25,
+                      mainAxisSpacing: 25),
+                  itemCount: provider.allTanks.length,itemBuilder: (context,index){
+                return TankUi(tank: provider.allTanks[index]);
+              }),
+            ),
+            Flexible(flex: 1,
+                child: Container(height: double.infinity,decoration: BoxDecoration(border: Border.all(color: Colors.grey)),)
+            )
+          ],
+        );
       }),
     );
   }

@@ -168,7 +168,7 @@ class _AddTankPopUpState extends State<AddTankPopUp> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 if (_formKey.currentState!.validate()) {
 
                   final tank = Tank(
@@ -181,7 +181,7 @@ class _AddTankPopUpState extends State<AddTankPopUp> {
                   );
 
                   if(widget.editTank == false){
-                    bool success = Provider.of<TankProvider>(context, listen: false)
+                    bool success = await Provider.of<TankProvider>(context, listen: false)
                         .addTank(tankData: tank);
                     if (!success) {
                       ScaffoldMessenger.of(context).showSnackBar(

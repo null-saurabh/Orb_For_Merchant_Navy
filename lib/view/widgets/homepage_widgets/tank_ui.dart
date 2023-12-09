@@ -66,7 +66,7 @@ class _TankUiState extends State<TankUi> {
                                       return Row(
                                         children: [
                                           Text(
-                                            "${index + 1}. ${operationsForThisTank[index].operationFunctionName}: ${operationsForThisTank[index].operationFunctionValue}",
+                                            "${operationsForThisTank[index].operationId + 1}. ${operationsForThisTank[index].operationFunctionName}: ${operationsForThisTank[index].operationFunctionValue}",
                                           ),
                                           IconButton(icon:  const Icon(Icons.edit),onPressed: (){
 
@@ -90,6 +90,20 @@ class _TankUiState extends State<TankUi> {
                                             Provider.of<OperationProvider>(context,listen: false).deleteOperation(
                                                 operationId: operationsForThisTank[index].operationId, tankProvider: tankProvider);
                                           }),
+                                          IconButton(icon:  const Icon(Icons.add),onPressed: (){
+
+                                            // TankProvider tankProvider = Provider.of<TankProvider>(context,listen: false);
+
+                                          //   Provider.of<OperationProvider>(context,listen: false).insertOperation(
+                                          //       tankId: operationsForThisTank[index].tankId,
+                                          //       tankName: operationsForThisTank[index].tankName,
+                                          //       operationFunctionName: operationFunctionName,
+                                          //       operationFunctionValue: operationFunctionValue,
+                                          //       isTargetTank: isTargetTank,
+                                          //       insertIndex: operationsForThisTank[index].operationId,
+                                          //       tankProvider: tankProvider);
+                                          }),
+
                                         ],
                                       );
                                     },
