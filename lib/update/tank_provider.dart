@@ -17,7 +17,7 @@ class TankProvider extends ChangeNotifier {
       _tanks.add(tankData);
       notifyListeners();
 
-      await saveTanksToPreferences();
+      // await saveTanksToPreferences();
       return true;
     }else {
       return false;
@@ -163,13 +163,15 @@ class TankProvider extends ChangeNotifier {
             );
           }).toList();
 
-          operationProvider.addNewOperation(tankId: tankId,
+          operationProvider.addNewOperation(
+              tankId: tankId,
               tankName: tank.tankName,
               operationFunctionName: operationFunctionName,
               operationFunctionValue: operationFunctionValue,
               allInitialTankData: allInitialTankData,
               allFinalTankData: allFinalTankData,
-              isTargetTank: isTransfer);
+              isTargetTank: isTransfer
+          );
           notifyListeners();
           return true;
         }

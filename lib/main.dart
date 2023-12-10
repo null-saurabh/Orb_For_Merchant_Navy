@@ -9,16 +9,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  List<String>? tanksJson = prefs.getStringList('tanks');
+  // SharedPreferences prefs = await SharedPreferences.getInstance();
+  // List<String>? tanksJson = prefs.getStringList('tanks');
 
-  runApp(MyApp(hasTanks: tanksJson != null && tanksJson.isNotEmpty));
+  // runApp(MyApp(hasTanks: tanksJson != null && tanksJson.isNotEmpty));
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final bool hasTanks;
+  // final bool hasTanks;
 
-  const MyApp({super.key,required this.hasTanks});
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -36,7 +37,8 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home: hasTanks ? const HomePageScreen() : const AddTankScreen(),
+        // home: hasTanks ? const HomePageScreen() : const AddTankScreen(),
+        home: const AddTankScreen(),
       ),
     );
   }

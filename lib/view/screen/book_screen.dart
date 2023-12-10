@@ -16,55 +16,81 @@ class BookScreen extends StatefulWidget {
 class _BookScreenState extends State<BookScreen> {
   @override
   Widget build(BuildContext context) {
-    // print(Provider.of<TankProvider>(context, listen: false)
-    //     .allTanks.length);
     return Scaffold(
       appBar: AppBar(
         elevation: 5,
         title: const Text("Book"),
       ),
-      body: Consumer<OperationProvider>(
-          builder: (context, operationProvider, _){
-            List<Operation> allOperation = operationProvider.allOperations;
+      body:
+          Consumer<OperationProvider>(builder: (context, operationProvider, _) {
+        List<Operation> allOperation = operationProvider.allOperations;
+        TankProvider tankProvider =
+            Provider.of<TankProvider>(context, listen: false);
 
-            return ReorderableListView(
-              onReorder: (oldIndex, newIndex) {
+        return ReorderableListView(
+            onReorder: (oldIndex, newIndex) {
               if (oldIndex < newIndex) {
                 newIndex -= 1;
               }
-              operationProvider.reorderOperation(oldIndex, newIndex);
+              operationProvider.reorderOperation(
+                  oldIndex: oldIndex,
+                  newIndex: newIndex,
+                  tankProvider: tankProvider);
             },
-              children:List.generate(
-                  allOperation.length, (index) {
-                return ListTile(leading: Text((index+1).toString()),
-                  title:Text("${allOperation[index].tankName}: ${allOperation[index].operationFunctionName}, value: ${allOperation[index].operationFunctionValue}"),
-                  trailing: IconButton(icon: const Icon(Icons.edit),onPressed: (){
+            children: List.generate(allOperation.length, (index) {
+              double initialTankRob = allOperation[index]
+                  .allInitialTankData[allOperation[index]
+                      .allInitialTankData
+                      .indexWhere(
+                          (tank) => tank.tankId == allOperation[index].tankId)]
+                  .currentROB;
+              double finalTankRob = allOperation[index]
+                  .allFinalTankData[allOperation[index]
+                      .allFinalTankData
+                      .indexWhere(
+                          (tank) => tank.tankId == allOperation[index].tankId)]
+                  .currentROB;
 
-                    Tank tankData = Provider.of<TankProvider>(context, listen: false)
-                        .allTanks
-                        .firstWhere((tank) => tank.tankId == allOperation[index].tankId);
+              return ListTile(
+                key: ValueKey(index),
+                leading: Text((index + 1).toString()),
+                title: Text(
+                    "${allOperation[index].tankName} => ${allOperation[index].operationFunctionName}: ${allOperation[index].operationFunctionValue}, initial: $initialTankRob, final: $finalTankRob"),
 
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) => EditBookPopUp(
-                        tankData: tankData,
-                        operationId: allOperation[index].operationId,
-                        operationFunctionValue: allOperation[index].operationFunctionValue,
-                        operationFunctionName: allOperation[index].operationFunctionName,
-                      ),
-                    );
-                  }),
-                );
-              })
+                onTap: () {
+                  Tank tankData = tankProvider.allTanks.firstWhere(
+                      (tank) => tank.tankId == allOperation[index].tankId);
 
-            );
-          }
-      ),
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => EditBookPopUp(
+                      tankData: tankData,
+                      operationId: allOperation[index].operationId,
+                      operationFunctionValue:
+                          allOperation[index].operationFunctionValue,
+                      operationFunctionName:
+                          allOperation[index].operationFunctionName,
+                    ),
+                  );
+                }, // trailing: IconButton(icon: const Icon(Icons.edit),onPressed: (){
+                //
+                //   Tank tankData = tankProvider
+                //       .allTanks
+                //       .firstWhere((tank) => tank.tankId == allOperation[index].tankId);
+                //
+                //   showDialog(
+                //     context: context,
+                //     builder: (BuildContext context) => EditBookPopUp(
+                //       tankData: tankData,
+                //       operationId: allOperation[index].operationId,
+                //       operationFunctionValue: allOperation[index].operationFunctionValue,
+                //       operationFunctionName: allOperation[index].operationFunctionName,
+                //     ),
+                //   );
+                // }),
+              );
+            }));
+      }),
     );
   }
 }
-
-
-
-
-

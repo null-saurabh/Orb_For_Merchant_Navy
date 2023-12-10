@@ -24,6 +24,17 @@ class _TankUiState extends State<TankUi> {
 
   @override
   Widget build(BuildContext context) {
+    List<Operation> allOperationForThisTank = Provider.of<OperationProvider>(context).getOperationsForSingleTank(tankId: widget.tank.tankId);
+    List<Operation> filteredOperations = allOperationForThisTank.where((operation) => operation.operationFunctionName != "Daily Collection/Generation").toList();
+    Operation? dailyCollectionOperation;
+    for (Operation operation in allOperationForThisTank) {
+      if (operation.operationFunctionName == "Daily Collection/Generation") {
+        dailyCollectionOperation = operation;
+        break;
+      }
+    }
+    String dailyCollectionValue = dailyCollectionOperation != null ? dailyCollectionOperation.operationFunctionValue.toString() : "0.0";
+
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(8),
@@ -43,7 +54,9 @@ class _TankUiState extends State<TankUi> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const SizedBox(height: 15,),
-                        const Text("Daily Collection: 05"),
+                        widget.tank.tankFunctions!.contains("Daily Collection/Generation")
+                        ? Text("Daily Collection: $dailyCollectionValue")
+                            :const SizedBox(height: 1,) ,
                         const Text("Today's Operation's:",style:TextStyle(fontWeight: FontWeight.w500),),
                         Expanded(
                           child: Container(
@@ -56,31 +69,28 @@ class _TankUiState extends State<TankUi> {
                               padding: const EdgeInsets.only(top: 5.0,bottom: 5),
                               child: Consumer<OperationProvider>(
                                 builder: (context, operationProvider, _) {
-                                  // Get operations for the current tank
-                                  List<Operation> operationsForThisTank =
-                                  operationProvider.getOperationsForSingleTank(tankId:widget.tank.tankId);
 
                                   return ListView.builder(
-                                    itemCount: operationsForThisTank.length,
+                                    itemCount: allOperationForThisTank.length,
                                     itemBuilder: (context, index) {
                                       return Row(
                                         children: [
                                           Text(
-                                            "${operationsForThisTank[index].operationId + 1}. ${operationsForThisTank[index].operationFunctionName}: ${operationsForThisTank[index].operationFunctionValue}",
+                                            "${allOperationForThisTank[index].operationId + 1}. ${allOperationForThisTank[index].operationFunctionName}: ${allOperationForThisTank[index].operationFunctionValue}",
                                           ),
                                           IconButton(icon:  const Icon(Icons.edit),onPressed: (){
 
                                             Tank tankData = Provider.of<TankProvider>(context, listen: false)
                                                 .allTanks
-                                                .firstWhere((tank) => tank.tankId == operationsForThisTank[index].tankId);
+                                                .firstWhere((tank) => tank.tankId == allOperationForThisTank[index].tankId);
 
                                             showDialog(
                                               context: context,
                                               builder: (BuildContext context) => EditBookPopUp(
                                                 tankData: tankData,
-                                                operationId: operationsForThisTank[index].operationId,
-                                                operationFunctionValue: operationsForThisTank[index].operationFunctionValue,
-                                                operationFunctionName: operationsForThisTank[index].operationFunctionName,
+                                                operationId: allOperationForThisTank[index].operationId,
+                                                operationFunctionValue: allOperationForThisTank[index].operationFunctionValue,
+                                                operationFunctionName: allOperationForThisTank[index].operationFunctionName,
                                               ),
                                             );
                                           }),
@@ -88,21 +98,21 @@ class _TankUiState extends State<TankUi> {
 
                                             TankProvider tankProvider = Provider.of<TankProvider>(context,listen: false);
                                             Provider.of<OperationProvider>(context,listen: false).deleteOperation(
-                                                operationId: operationsForThisTank[index].operationId, tankProvider: tankProvider);
+                                                operationId: allOperationForThisTank[index].operationId, tankProvider: tankProvider);
                                           }),
-                                          IconButton(icon:  const Icon(Icons.add),onPressed: (){
-
-                                            // TankProvider tankProvider = Provider.of<TankProvider>(context,listen: false);
-
-                                          //   Provider.of<OperationProvider>(context,listen: false).insertOperation(
-                                          //       tankId: operationsForThisTank[index].tankId,
-                                          //       tankName: operationsForThisTank[index].tankName,
-                                          //       operationFunctionName: operationFunctionName,
-                                          //       operationFunctionValue: operationFunctionValue,
-                                          //       isTargetTank: isTargetTank,
-                                          //       insertIndex: operationsForThisTank[index].operationId,
-                                          //       tankProvider: tankProvider);
-                                          }),
+                                          // IconButton(icon:  const Icon(Icons.add),onPressed: (){
+                                          //
+                                          //   // TankProvider tankProvider = Provider.of<TankProvider>(context,listen: false);
+                                          //
+                                          // //   Provider.of<OperationProvider>(context,listen: false).insertOperation(
+                                          // //       tankId: operationsForThisTank[index].tankId,
+                                          // //       tankName: operationsForThisTank[index].tankName,
+                                          // //       operationFunctionName: operationFunctionName,
+                                          // //       operationFunctionValue: operationFunctionValue,
+                                          // //       isTargetTank: isTargetTank,
+                                          // //       insertIndex: operationsForThisTank[index].operationId,
+                                          // //       tankProvider: tankProvider);
+                                          // }),
 
                                         ],
                                       );

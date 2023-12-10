@@ -28,22 +28,12 @@ class OperationProvider extends ChangeNotifier {
 
     _operations.add(newOperation);
     if(_operations.length >2){
-      print(_operations[1].allInitialTankData[allInitialTankData.indexWhere((tank) => tank.tankId == tankId)].currentROB);
-      print(_operations[1].allFinalTankData[allFinalTankData.indexWhere((tank) => tank.tankId == tankId)].currentROB);
-
+      // print(_operations[1].allInitialTankData[allInitialTankData.indexWhere((tank) => tank.tankId == tankId)].currentROB);
+      // print(_operations[1].allFinalTankData[allFinalTankData.indexWhere((tank) => tank.tankId == tankId)].currentROB);
     }
   }
 
-  void insertOperation({
-    required int tankId,
-    required String tankName,
-    required String operationFunctionName,
-    required double operationFunctionValue,
-    required bool isTargetTank,
-    String? targetTankName,
-    required int insertIndex,
-    required TankProvider tankProvider,
-  }) {
+  void insertOperation({required int tankId,    required String tankName,    required String operationFunctionName,    required double operationFunctionValue,    required bool isTargetTank,    String? targetTankName,    required int insertIndex, required TankProvider tankProvider,}) {
     // Check if the insertIndex is within bounds
     if (insertIndex < 0 || insertIndex > _operations.length) {
       throw ArgumentError("Invalid insertIndex");
@@ -57,11 +47,11 @@ class OperationProvider extends ChangeNotifier {
       // If inserting at the beginning, use the initial data of the first tank
       allInitialTankData = _operations.isNotEmpty ? _operations.first.allInitialTankData : [];
     } else {
+
       // If inserting in the middle, use the final data of the preceding operation
-      allInitialTankData = _operations[insertIndex].allInitialTankData;
-      // List<Tank> b = _operations.first.allFinalTankData;
-      // print("-a: ${b[b.indexWhere((tank) => tank.tankId == tankId)].currentROB}");
-      // print("a: ${allInitialTankData[allInitialTankData.indexWhere((tank) => tank.tankId == tankId)].currentROB}");
+      allInitialTankData = _operations[insertIndex-1].allFinalTankData;
+      // allInitialTankData = _operations[insertIndex].allInitialTankData;
+
     }
 
     // Perform the function to get allFinalTankData
@@ -74,7 +64,18 @@ class OperationProvider extends ChangeNotifier {
       targetTankName: isTargetTank ? targetTankName : null,
     );
 
-    lastFinalTankData = allFinalTankData;
+    List<Tank> deepCopyAllFinalTankData = List.from(allFinalTankData.map((tank) {
+      return Tank(
+        tankId: tank.tankId,
+        tankName: tank.tankName,
+        currentROB: tank.currentROB,
+        totalCapacity: tank.totalCapacity,
+        tankType: tank.tankType,
+        tankFunctions: tank.tankFunctions != null ? [...tank.tankFunctions!] : null,
+      );
+    }));
+
+    lastFinalTankData = deepCopyAllFinalTankData;
     // print("after executing: ${lastFinalTankData[lastFinalTankData.indexWhere((tank) => tank.tankId == tankId)].currentROB}");
 
     // Create the new operation
@@ -86,7 +87,7 @@ class OperationProvider extends ChangeNotifier {
       operationFunctionValue: operationFunctionValue,
       isTargetTank: isTargetTank,
       allInitialTankData: allInitialTankData,
-      allFinalTankData: allFinalTankData,
+      allFinalTankData: deepCopyAllFinalTankData,
       targetTankName: isTargetTank ? targetTankName : null,
     );
 
@@ -116,6 +117,17 @@ class OperationProvider extends ChangeNotifier {
             : null,
       );
 
+      List<Tank> deepCopyUpdatedAllTankData = List.from(updatedAllTankData.map((tank) {
+        return Tank(
+          tankId: tank.tankId,
+          tankName: tank.tankName,
+          currentROB: tank.currentROB,
+          totalCapacity: tank.totalCapacity,
+          tankType: tank.tankType,
+          tankFunctions: tank.tankFunctions != null ? [...tank.tankFunctions!] : null,
+        );
+      }));
+
       // print("Iterating Rob: ${updatedAllTankData[updatedAllTankData.indexWhere((tank) => tank.tankId == tankId)].currentROB}");
       // Update the subsequent operation with the new tank data
       Operation updatedOperation = Operation(
@@ -126,7 +138,7 @@ class OperationProvider extends ChangeNotifier {
         operationFunctionValue: subsequentOperation.operationFunctionValue,
         isTargetTank: subsequentOperation.operationFunctionName.contains("To"),
         allInitialTankData: lastFinalTankData,
-        allFinalTankData: updatedAllTankData,
+        allFinalTankData: deepCopyUpdatedAllTankData,
         targetTankName: subsequentOperation.operationFunctionName.contains("To")
             ? subsequentOperation.operationFunctionName.replaceFirst("To ", "")
             : null,
@@ -136,7 +148,7 @@ class OperationProvider extends ChangeNotifier {
         operationId: subsequentOperation.operationId,
         newOperationData: updatedOperation,
       );
-      lastFinalTankData = updatedAllTankData;
+      lastFinalTankData = deepCopyUpdatedAllTankData;
     }
 
     tankProvider.updateAllTanks(lastFinalTankData);
@@ -162,7 +174,18 @@ class OperationProvider extends ChangeNotifier {
           targetTankName: newOperationFunctionName.contains("To") ? newOperationFunctionName.replaceFirst("To ",""):null,
       );
 
-      lastFinalTankData = editedOperationAllTankData;
+      List<Tank> deepCopyEditedOperationAllTankData = List.from(editedOperationAllTankData.map((tank) {
+        return Tank(
+          tankId: tank.tankId,
+          tankName: tank.tankName,
+          currentROB: tank.currentROB,
+          totalCapacity: tank.totalCapacity,
+          tankType: tank.tankType,
+          tankFunctions: tank.tankFunctions != null ? [...tank.tankFunctions!] : null,
+        );
+      }));
+
+      lastFinalTankData = deepCopyEditedOperationAllTankData;
 
       // Update the edited operation
       Operation newEditedOperation = Operation(
@@ -173,7 +196,8 @@ class OperationProvider extends ChangeNotifier {
           operationFunctionValue: newOperationFunctionValue,
           isTargetTank: newOperationFunctionName.contains("To")? true:false,
           allInitialTankData: operationToEdit.allInitialTankData,
-          allFinalTankData: editedOperationAllTankData,
+          allFinalTankData: deepCopyEditedOperationAllTankData,
+          // allFinalTankData: editedOperationAllTankData,
           targetTankName: newOperationFunctionName.contains("To") ? newOperationFunctionName.replaceFirst("To ",""):null
       );
 
@@ -184,8 +208,10 @@ class OperationProvider extends ChangeNotifier {
 
       // Iterate through subsequent operations and update them
       for (int i = index + 1; i < _operations.length; i++) {
-
+        print('in iterate');
         Operation subsequentOperation = _operations[i];
+
+        // List<Tank> lastFinalTankData = _operations[i - 1].allFinalTankData;
 
         List<Tank> updatedAllTankData = performEditedOperation(
           allInitialTankData: lastFinalTankData,
@@ -196,6 +222,17 @@ class OperationProvider extends ChangeNotifier {
           targetTankName: subsequentOperation.operationFunctionName.contains("To") ? subsequentOperation.operationFunctionName.replaceFirst("To ", "") : null,
         );
 
+        List<Tank> deepCopyUpdatedAllTankData = List.from(updatedAllTankData.map((tank) {
+          return Tank(
+            tankId: tank.tankId,
+            tankName: tank.tankName,
+            currentROB: tank.currentROB,
+            totalCapacity: tank.totalCapacity,
+            tankType: tank.tankType,
+            tankFunctions: tank.tankFunctions != null ? [...tank.tankFunctions!] : null,
+          );
+        }));
+
         // Update the subsequent operation with the new tank data
         Operation updatedOperation = Operation(
           operationId: subsequentOperation.operationId,
@@ -205,13 +242,15 @@ class OperationProvider extends ChangeNotifier {
           operationFunctionValue: subsequentOperation.operationFunctionValue,
           isTargetTank: subsequentOperation.operationFunctionName.contains("To") ? true : false,
           allInitialTankData: lastFinalTankData,
-          allFinalTankData: updatedAllTankData,
+          allFinalTankData: deepCopyUpdatedAllTankData,
           targetTankName: subsequentOperation.operationFunctionName.contains("To") ? subsequentOperation.operationFunctionName.replaceFirst("To ", "") : null,
         );
 
         updateEditedOperation(operationId: subsequentOperation.operationId, newOperationData: updatedOperation);
-        lastFinalTankData = updatedAllTankData;
+        lastFinalTankData = deepCopyUpdatedAllTankData;
       }
+      // tankProvider.updateAllTanks(_operations.last.allFinalTankData);
+      // tankProvider.updateAllTanks(editedOperationAllTankData);
       tankProvider.updateAllTanks(lastFinalTankData);
     }
   }
@@ -246,6 +285,17 @@ class OperationProvider extends ChangeNotifier {
           targetTankName: subsequentOperation.operationFunctionName.contains("To") ? subsequentOperation.operationFunctionName.replaceFirst("To ", "") : null,
         );
 
+        List<Tank> deepCopyUpdatedAllTankData = List.from(updatedAllTankData.map((tank) {
+          return Tank(
+            tankId: tank.tankId,
+            tankName: tank.tankName,
+            currentROB: tank.currentROB,
+            totalCapacity: tank.totalCapacity,
+            tankType: tank.tankType,
+            tankFunctions: tank.tankFunctions != null ? [...tank.tankFunctions!] : null,
+          );
+        }));
+
         // Update the subsequent operation with the new tank data
         Operation updatedOperation = Operation(
           operationId: subsequentOperation.operationId,
@@ -255,12 +305,12 @@ class OperationProvider extends ChangeNotifier {
           operationFunctionValue: subsequentOperation.operationFunctionValue,
           isTargetTank: subsequentOperation.operationFunctionName.contains("To") ? true : false,
           allInitialTankData: lastFinalTankData,
-          allFinalTankData: updatedAllTankData,
+          allFinalTankData: deepCopyUpdatedAllTankData,
           targetTankName: subsequentOperation.operationFunctionName.contains("To") ? subsequentOperation.operationFunctionName.replaceFirst("To ", "") : null,
         );
 
         updateEditedOperation(operationId: subsequentOperation.operationId, newOperationData: updatedOperation);
-        lastFinalTankData = updatedAllTankData;
+        lastFinalTankData = deepCopyUpdatedAllTankData;
       }
 
       tankProvider.updateAllTanks(lastFinalTankData);
@@ -277,7 +327,7 @@ class OperationProvider extends ChangeNotifier {
         currentROB: tank.currentROB,
         totalCapacity: tank.totalCapacity,
         tankType: tank.tankType,
-        tankFunctions: tank.tankFunctions != null ? [...tank.tankFunctions!] : null,
+        tankFunctions: tank.tankFunctions != null ? List<String>.from(tank.tankFunctions!) : null,
       );
     }).toList();
 
@@ -303,10 +353,41 @@ class OperationProvider extends ChangeNotifier {
   void updateEditedOperation({required int operationId, required Operation newOperationData}){
     int index = _operations.indexWhere((operation) => operation.operationId == operationId);
     if (index != -1) {
-      _operations[index] = newOperationData;
+
+      Operation updatedOperation = Operation(
+        operationId: newOperationData.operationId,
+        tankId: newOperationData.tankId,
+        tankName: newOperationData.tankName,
+        operationFunctionName: newOperationData.operationFunctionName,
+        operationFunctionValue: newOperationData.operationFunctionValue,
+        isTargetTank: newOperationData.isTargetTank,
+        allInitialTankData: newOperationData.allInitialTankData,
+        allFinalTankData: newOperationData.allFinalTankData,
+        targetTankName: newOperationData.targetTankName,
+      );
+
+      _operations[index] = updatedOperation;
       notifyListeners();
     }
   }
 
+  void reorderOperation({required int oldIndex, required int newIndex, required TankProvider tankProvider}) {
+    if (oldIndex < 0 || oldIndex >= _operations.length || newIndex < 0 || newIndex >= _operations.length) {
+      return;
+    }
+
+    int movedItemOperationId = _operations[oldIndex].operationId;
+    int movedItemTankId = _operations[oldIndex].tankId;
+    String movedItemTankName = _operations[oldIndex].tankName;
+    String movedItemOperationFunctionName = _operations[oldIndex].operationFunctionName;
+    double movedItemOperationFunctionValue = _operations[oldIndex].operationFunctionValue;
+    bool movedItemIsTargetTank = _operations[oldIndex].isTargetTank;
+    String? movedItemTargetName = _operations[oldIndex].targetTankName;
+
+    deleteOperation(operationId: movedItemOperationId, tankProvider: tankProvider);
+    insertOperation(tankId: movedItemTankId, tankName: movedItemTankName, operationFunctionName: movedItemOperationFunctionName, operationFunctionValue: movedItemOperationFunctionValue, isTargetTank: movedItemIsTargetTank, insertIndex: newIndex, tankProvider: tankProvider,targetTankName: movedItemTargetName);
+
+    notifyListeners();
+  }
 
 }
