@@ -16,17 +16,37 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
+  DateTime _selectedDate = DateTime.now();
+
+
   // @override
   // void initState() {
   //   TankProvider tankProvider = TankProvider();
   //   tankProvider.initializeTanksFromPreferences();
   //   super.initState();
   // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(elevation: 5, title: const Text("ORB"), actions: [
+        IconButton(
+          icon: const Icon(Icons.calendar_today),
+          onPressed: () async {
+            DateTime? pickedDate = await showDatePicker(
+              context: context,
+              initialDate: _selectedDate,
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2101),
+            );
+
+            if (pickedDate != null && pickedDate != _selectedDate) {
+              setState(() {
+                _selectedDate = pickedDate;
+              });
+            }
+          },
+        ),
+
         IconButton(
           icon: const Icon(Icons.menu_book_outlined),
           onPressed: () {
@@ -56,7 +76,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   ),
                   itemCount: provider.allTanks.length,
                   itemBuilder: (context, index) {
-                    return TankUi(tank: provider.allTanks[index]);
+                    return TankUi(tank: provider.allTanks[index],date:  _selectedDate);
                   }),
             ),
             Flexible(

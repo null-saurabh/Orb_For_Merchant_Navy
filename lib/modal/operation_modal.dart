@@ -9,7 +9,9 @@ class Operation {
   final bool isTargetTank;
   final List<Tank> allInitialTankData;
   final List<Tank> allFinalTankData;
+  final DateTime date;
   final String? targetTankName;
+
 
   Operation({
     required this.operationId,
@@ -20,6 +22,7 @@ class Operation {
     required this.isTargetTank,
     required this.allInitialTankData,
     required this.allFinalTankData,
+    required this.date,
     this.targetTankName
   });
 }

@@ -10,8 +10,10 @@ import 'package:provider/provider.dart';
 
 class TankUi extends StatefulWidget {
   final Tank tank;
+  final DateTime date;
   const TankUi({
     required this.tank,
+    required this.date,
     super.key,
   });
 
@@ -134,11 +136,11 @@ class _TankUiState extends State<TankUi> {
                                             );
                                           }),
                                           IconButton(icon:  const Icon(Icons.delete),onPressed: (){
-
                                             TankProvider tankProvider = Provider.of<TankProvider>(context,listen: false);
                                             Provider.of<OperationProvider>(context,listen: false).deleteOperation(
                                                 operationId: filteredOutDailyCollectionFromThisTankOperations[index].operationId, tankProvider: tankProvider);
                                           }),
+
                                           // IconButton(icon:  const Icon(Icons.add),onPressed: (){
                                           //
                                           //   // TankProvider tankProvider = Provider.of<TankProvider>(context,listen: false);

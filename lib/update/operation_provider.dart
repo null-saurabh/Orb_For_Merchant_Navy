@@ -13,7 +13,7 @@ class OperationProvider extends ChangeNotifier {
     return _operations.where((operation) => operation.tankId == tankId).toList();
   }
 
-  void addNewOperation({required int tankId,required String tankName,required String operationFunctionName, required double operationFunctionValue, required List<Tank> allInitialTankData, required List<Tank> allFinalTankData,required bool isTargetTank, String? targetTankName}){
+  void addNewOperation({required int tankId,required String tankName,required String operationFunctionName, required double operationFunctionValue, required List<Tank> allInitialTankData, required List<Tank> allFinalTankData,required bool isTargetTank,required DateTime date ,String? targetTankName}){
     Operation newOperation = Operation(
         operationId: _operations.length,
         tankId: tankId,
@@ -23,6 +23,7 @@ class OperationProvider extends ChangeNotifier {
         isTargetTank: isTargetTank,
         allInitialTankData: allInitialTankData,
         allFinalTankData: allFinalTankData,
+      date: date,
       targetTankName: isTargetTank ? targetTankName : null,
     );
 
@@ -33,7 +34,7 @@ class OperationProvider extends ChangeNotifier {
     }
   }
 
-  void insertOperation({required int tankId,    required String tankName,    required String operationFunctionName,    required double operationFunctionValue,    required bool isTargetTank,    String? targetTankName,    required int insertIndex, required TankProvider tankProvider,}) {
+  void insertOperation({required int tankId,    required String tankName,    required String operationFunctionName,    required double operationFunctionValue,    required bool isTargetTank,  required DateTime date , String? targetTankName,    required int insertIndex, required TankProvider tankProvider,}) {
     // Check if the insertIndex is within bounds
     if (insertIndex < 0 || insertIndex > _operations.length) {
       throw ArgumentError("Invalid insertIndex");
@@ -89,6 +90,7 @@ class OperationProvider extends ChangeNotifier {
       allInitialTankData: allInitialTankData,
       allFinalTankData: deepCopyAllFinalTankData,
       targetTankName: isTargetTank ? targetTankName : null,
+      date: date
     );
 
     // Insert the new operation at the specified index
@@ -142,6 +144,7 @@ class OperationProvider extends ChangeNotifier {
         targetTankName: subsequentOperation.operationFunctionName.contains("To")
             ? subsequentOperation.operationFunctionName.replaceFirst("To ", "")
             : null,
+        date: subsequentOperation.date
       );
 
       updateEditedOperation(
@@ -198,7 +201,8 @@ class OperationProvider extends ChangeNotifier {
           allInitialTankData: operationToEdit.allInitialTankData,
           allFinalTankData: deepCopyEditedOperationAllTankData,
           // allFinalTankData: editedOperationAllTankData,
-          targetTankName: newOperationFunctionName.contains("To") ? newOperationFunctionName.replaceFirst("To ",""):null
+          targetTankName: newOperationFunctionName.contains("To") ? newOperationFunctionName.replaceFirst("To ",""):null,
+          date: operationToEdit.date
       );
 
 
@@ -244,6 +248,7 @@ class OperationProvider extends ChangeNotifier {
           allInitialTankData: lastFinalTankData,
           allFinalTankData: deepCopyUpdatedAllTankData,
           targetTankName: subsequentOperation.operationFunctionName.contains("To") ? subsequentOperation.operationFunctionName.replaceFirst("To ", "") : null,
+          date: subsequentOperation.date
         );
 
         updateEditedOperation(operationId: subsequentOperation.operationId, newOperationData: updatedOperation);
@@ -307,6 +312,7 @@ class OperationProvider extends ChangeNotifier {
           allInitialTankData: lastFinalTankData,
           allFinalTankData: deepCopyUpdatedAllTankData,
           targetTankName: subsequentOperation.operationFunctionName.contains("To") ? subsequentOperation.operationFunctionName.replaceFirst("To ", "") : null,
+        date: subsequentOperation.date
         );
 
         updateEditedOperation(operationId: subsequentOperation.operationId, newOperationData: updatedOperation);
@@ -364,6 +370,7 @@ class OperationProvider extends ChangeNotifier {
         allInitialTankData: newOperationData.allInitialTankData,
         allFinalTankData: newOperationData.allFinalTankData,
         targetTankName: newOperationData.targetTankName,
+        date: newOperationData.date
       );
 
       _operations[index] = updatedOperation;
@@ -382,10 +389,11 @@ class OperationProvider extends ChangeNotifier {
     String movedItemOperationFunctionName = _operations[oldIndex].operationFunctionName;
     double movedItemOperationFunctionValue = _operations[oldIndex].operationFunctionValue;
     bool movedItemIsTargetTank = _operations[oldIndex].isTargetTank;
+    DateTime movedItemDate =_operations[oldIndex].date;
     String? movedItemTargetName = _operations[oldIndex].targetTankName;
 
     deleteOperation(operationId: movedItemOperationId, tankProvider: tankProvider);
-    insertOperation(tankId: movedItemTankId, tankName: movedItemTankName, operationFunctionName: movedItemOperationFunctionName, operationFunctionValue: movedItemOperationFunctionValue, isTargetTank: movedItemIsTargetTank, insertIndex: newIndex, tankProvider: tankProvider,targetTankName: movedItemTargetName);
+    insertOperation(tankId: movedItemTankId, tankName: movedItemTankName, operationFunctionName: movedItemOperationFunctionName, operationFunctionValue: movedItemOperationFunctionValue, isTargetTank: movedItemIsTargetTank, insertIndex: newIndex, tankProvider: tankProvider,date: movedItemDate,targetTankName: movedItemTargetName);
 
     notifyListeners();
   }

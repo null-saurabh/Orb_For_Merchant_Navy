@@ -168,7 +168,9 @@ class _ExecuteFunctionPopUpState extends State<ExecuteFunctionPopUp> {
                             targetTankName: arithmeticExpression == "transfer"
                                 ? widget.functionName.replaceFirst("To ", "")
                                 : null,
-                            operationProvider: operationProvider);
+                            operationProvider: operationProvider,
+                      date: DateTime.now()
+                    );
 
                     if (!success) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -198,6 +200,8 @@ class _ExecuteFunctionPopUpState extends State<ExecuteFunctionPopUp> {
                           : null,
                       insertIndex: enteredOperationId -1 + totalDailyCollectionOperations,
                       tankProvider: Provider.of<TankProvider>(context, listen: false),
+                        date: DateTime.now()
+
                     );
                     Navigator.pop(context);
 

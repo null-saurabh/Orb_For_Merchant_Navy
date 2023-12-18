@@ -59,6 +59,7 @@ class TankProvider extends ChangeNotifier {
     required String arithmeticExpression,
     required bool isTransfer,
     required OperationProvider operationProvider,
+    required DateTime date,
     String? targetTankName,
   }) {
 
@@ -104,7 +105,8 @@ class TankProvider extends ChangeNotifier {
               operationFunctionValue: operationFunctionValue,
               allInitialTankData: allInitialTankData,
               allFinalTankData: allFinalTankData,
-              isTargetTank: isTransfer
+              isTargetTank: isTransfer,
+              date: date
           );
           notifyListeners();
           return true;
@@ -141,7 +143,8 @@ class TankProvider extends ChangeNotifier {
               operationFunctionValue: operationFunctionValue,
               allInitialTankData: allInitialTankData,
               allFinalTankData: allFinalTankData,
-              isTargetTank: isTransfer
+              isTargetTank: isTransfer,
+            date: date
           );
           notifyListeners();
           return true;
@@ -181,7 +184,8 @@ class TankProvider extends ChangeNotifier {
                 allInitialTankData: allInitialTankData,
                 allFinalTankData: allFinalTankData,
                 isTargetTank: isTransfer,
-                targetTankName: targetTank.tankName
+                targetTankName: targetTank.tankName,
+              date: date
             );
             notifyListeners();
             return true;
@@ -211,7 +215,8 @@ class TankProvider extends ChangeNotifier {
           operationFunctionValue: 0,
           arithmeticExpression: "add",
           isTransfer: false,
-          operationProvider: operationProvider
+          operationProvider: operationProvider,
+        date: DateTime.now()
       );
     }
   }
