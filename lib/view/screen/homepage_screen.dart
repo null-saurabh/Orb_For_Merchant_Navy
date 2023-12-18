@@ -72,7 +72,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     TankProvider tankProvider =
                         Provider.of<TankProvider>(context, listen: false);
 
-                    return buildReorderAbleListView(operationProvider, tankProvider, allOperation, context);
+                    return bookOverView(operationProvider, tankProvider, allOperation, context);
                   }),
                 ))
           ],
@@ -81,7 +81,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
     );
   }
 
-  ReorderableListView buildReorderAbleListView(OperationProvider operationProvider, TankProvider tankProvider, List<Operation> allOperation, BuildContext context) {
+  ReorderableListView bookOverView(OperationProvider operationProvider, TankProvider tankProvider, List<Operation> allOperation, BuildContext context) {
     return ReorderableListView(
                       onReorder: (oldIndex, newIndex) {
                         if (oldIndex < newIndex) {
@@ -106,7 +106,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                                     tank.tankId ==
                                     allOperation[index].tankId)];
 
-                        print("${allOperation[index].tankName} => ${allOperation[index].operationFunctionName}: ${allOperation[index].operationFunctionValue} ( initial: ${initialTank.currentROB}, final: ${finalTank.currentROB} )");
+                        // print("${allOperation[index].tankName} => ${allOperation[index].operationFunctionName}: ${allOperation[index].operationFunctionValue} ( initial: ${initialTank.currentROB}, final: ${finalTank.currentROB} )");
                         return ListTile(
                           key: ValueKey(index),
                           leading: Text((index + 1).toString()),

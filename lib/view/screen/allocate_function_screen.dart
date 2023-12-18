@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orb/update/operation_provider.dart';
 import 'package:orb/update/tank_provider.dart';
 import 'package:orb/view/screen/homepage_screen.dart';
 import 'package:orb/view/widgets/allocate_function_widgets/function_selection_popup.dart';
@@ -40,6 +41,17 @@ class AllocateFunctionToTank extends StatelessWidget {
                                 tank.tankFunctions!.isNotEmpty,
                           );
                   if (allTanksHaveOperations) {
+                    OperationProvider operationProvider =
+                    Provider.of<OperationProvider>(context, listen: false);
+
+                    Provider.of<TankProvider>(context, listen: false)
+                        .allTanks
+                        .forEach((tank) {
+                      Provider.of<TankProvider>(context, listen: false)
+                          .performDailyCollection(tank,operationProvider);
+                    });
+
+
                     Navigator.push(
                         context,
                         MaterialPageRoute(

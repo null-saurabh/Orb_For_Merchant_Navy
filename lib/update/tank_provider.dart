@@ -24,35 +24,6 @@ class TankProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> saveTanksToPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    List<String> tanksJson = _tanks.map((tank) => json.encode(tank.toJson())).toList();
-
-    prefs.setStringList('tanks', tanksJson);
-  }
-
-  Future<void> initializeTanksFromPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    print('initialize');
-    // Get the list of JSON strings from SharedPreferences
-    List<String>? tanksJson = prefs.getStringList('tanks');
-
-    if (tanksJson != null) {
-      // Convert each JSON string back to a Tank object
-      List<Tank> initializedTanks = tanksJson.map((jsonString) => Tank.fromJson(json.decode(jsonString))).toList();
-      // Update the tanks in the provider
-      _tanks = initializedTanks;
-      print(_tanks.last.tankName);
-      // Notify listeners that the data has changed
-      notifyListeners();
-    }
-    else{
-      print("else");
-    }
-  }
-
   void editTank({required int tankId, required Tank editedTankData}) {
     int index = _tanks.indexWhere((tank) => tank.tankId == tankId);
     if (index != -1) {
@@ -230,4 +201,47 @@ class TankProvider extends ChangeNotifier {
     }
   }
 
+  void performDailyCollection(Tank tank, OperationProvider operationProvider) {
+    // Check if the tank has the "Daily Collection/Generation" function
+    if (tank.tankFunctions != null && tank.tankFunctions!.contains("Daily Collection/Generation")) {
+      // Perform the new function with a value of 0
+      performNewFunction(
+          tankId: tank.tankId,
+          operationFunctionName: "Daily Collection/Generation",
+          operationFunctionValue: 0,
+          arithmeticExpression: "add",
+          isTransfer: false,
+          operationProvider: operationProvider
+      );
+    }
+  }
+
+  Future<void> saveTanksToPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    List<String> tanksJson = _tanks.map((tank) => json.encode(tank.toJson())).toList();
+
+    prefs.setStringList('tanks', tanksJson);
+  }
+
+  Future<void> initializeTanksFromPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    print('initialize');
+    // Get the list of JSON strings from SharedPreferences
+    List<String>? tanksJson = prefs.getStringList('tanks');
+
+    if (tanksJson != null) {
+      // Convert each JSON string back to a Tank object
+      List<Tank> initializedTanks = tanksJson.map((jsonString) => Tank.fromJson(json.decode(jsonString))).toList();
+      // Update the tanks in the provider
+      _tanks = initializedTanks;
+      print(_tanks.last.tankName);
+      // Notify listeners that the data has changed
+      notifyListeners();
+    }
+    else{
+      print("else");
+    }
+  }
 }

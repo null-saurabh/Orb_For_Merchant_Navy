@@ -25,7 +25,12 @@ class _TankUiState extends State<TankUi> {
   @override
   Widget build(BuildContext context) {
     List<Operation> allOperationForThisTank = Provider.of<OperationProvider>(context).getOperationsForSingleTank(tankId: widget.tank.tankId);
-    List<Operation> filteredOperations = allOperationForThisTank.where((operation) => operation.operationFunctionName != "Daily Collection/Generation").toList();
+    List<Operation> filteredOutDailyCollectionFromThisTankOperations = allOperationForThisTank.where((operation) => operation.operationFunctionName != "Daily Collection/Generation").toList();
+
+    List<Operation> allOperation = Provider.of<OperationProvider>(context).allOperations;
+    List<Operation> filteredOutDailyCollectionFromAllTankOperations = allOperation.where((operation) => operation.operationFunctionName != "Daily Collection/Generation").toList();
+    int totalDailyCollectionOperations = allOperation.length - filteredOutDailyCollectionFromAllTankOperations.length;
+
     Operation? dailyCollectionOperation;
     for (Operation operation in allOperationForThisTank) {
       if (operation.operationFunctionName == "Daily Collection/Generation") {
@@ -55,7 +60,27 @@ class _TankUiState extends State<TankUi> {
                       children: [
                         const SizedBox(height: 15,),
                         widget.tank.tankFunctions!.contains("Daily Collection/Generation")
-                        ? Text("Daily Collection: $dailyCollectionValue")
+                        ? Row(
+                          children: [
+                            IconButton(icon:  const Icon(Icons.edit),onPressed: (){
+
+                              Tank tankData = Provider.of<TankProvider>(context, listen: false)
+                                  .allTanks
+                                  .firstWhere((tank) => tank.tankId == dailyCollectionOperation!.tankId);
+
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) => EditBookPopUp(
+                                  tankData: tankData,
+                                  operationId: dailyCollectionOperation!.operationId,
+                                  operationFunctionValue: dailyCollectionOperation.operationFunctionValue,
+                                  operationFunctionName: dailyCollectionOperation.operationFunctionName,
+                                ),
+                              );
+                            }),
+                            Text("Daily Collection: $dailyCollectionValue"),
+                          ],
+                        )
                             :const SizedBox(height: 1,) ,
                         const Text("Today's Operation's:",style:TextStyle(fontWeight: FontWeight.w500),),
                         Expanded(
@@ -71,26 +96,40 @@ class _TankUiState extends State<TankUi> {
                                 builder: (context, operationProvider, _) {
 
                                   return ListView.builder(
-                                    itemCount: allOperationForThisTank.length,
+                                    itemCount: filteredOutDailyCollectionFromThisTankOperations.length,
                                     itemBuilder: (context, index) {
+
+                                      Tank initialTank = filteredOutDailyCollectionFromThisTankOperations[index]
+                                          .allInitialTankData[filteredOutDailyCollectionFromThisTankOperations[index]
+                                          .allInitialTankData
+                                          .indexWhere((tank) =>
+                                      tank.tankId ==
+                                          filteredOutDailyCollectionFromThisTankOperations[index].tankId)];
+                                      Tank finalTank = filteredOutDailyCollectionFromThisTankOperations[index]
+                                          .allFinalTankData[filteredOutDailyCollectionFromThisTankOperations[index]
+                                          .allFinalTankData
+                                          .indexWhere((tank) =>
+                                      tank.tankId ==
+                                          filteredOutDailyCollectionFromThisTankOperations[index].tankId)];
+
                                       return Row(
                                         children: [
                                           Text(
-                                            "${allOperationForThisTank[index].operationId + 1}. ${allOperationForThisTank[index].operationFunctionName}: ${allOperationForThisTank[index].operationFunctionValue}",
+                                            "${filteredOutDailyCollectionFromThisTankOperations[index].operationId + 1 - totalDailyCollectionOperations}. ${filteredOutDailyCollectionFromThisTankOperations[index].operationFunctionName}: ${filteredOutDailyCollectionFromThisTankOperations[index].operationFunctionValue} ( B.O: ${initialTank.currentROB}, A.O: ${finalTank.currentROB})",
                                           ),
                                           IconButton(icon:  const Icon(Icons.edit),onPressed: (){
 
                                             Tank tankData = Provider.of<TankProvider>(context, listen: false)
                                                 .allTanks
-                                                .firstWhere((tank) => tank.tankId == allOperationForThisTank[index].tankId);
+                                                .firstWhere((tank) => tank.tankId == filteredOutDailyCollectionFromThisTankOperations[index].tankId);
 
                                             showDialog(
                                               context: context,
                                               builder: (BuildContext context) => EditBookPopUp(
                                                 tankData: tankData,
-                                                operationId: allOperationForThisTank[index].operationId,
-                                                operationFunctionValue: allOperationForThisTank[index].operationFunctionValue,
-                                                operationFunctionName: allOperationForThisTank[index].operationFunctionName,
+                                                operationId: filteredOutDailyCollectionFromThisTankOperations[index].operationId,
+                                                operationFunctionValue: filteredOutDailyCollectionFromThisTankOperations[index].operationFunctionValue,
+                                                operationFunctionName: filteredOutDailyCollectionFromThisTankOperations[index].operationFunctionName,
                                               ),
                                             );
                                           }),
@@ -98,7 +137,7 @@ class _TankUiState extends State<TankUi> {
 
                                             TankProvider tankProvider = Provider.of<TankProvider>(context,listen: false);
                                             Provider.of<OperationProvider>(context,listen: false).deleteOperation(
-                                                operationId: allOperationForThisTank[index].operationId, tankProvider: tankProvider);
+                                                operationId: filteredOutDailyCollectionFromThisTankOperations[index].operationId, tankProvider: tankProvider);
                                           }),
                                           // IconButton(icon:  const Icon(Icons.add),onPressed: (){
                                           //
@@ -142,7 +181,7 @@ class _TankUiState extends State<TankUi> {
                               });
                             },
                             value: performOperation,
-                            items: widget.tank.tankFunctions!.map<DropdownMenuItem<String>>((String value) {
+                            items: widget.tank.tankFunctions!.where((function) => function != "Daily Collection/Generation").map<DropdownMenuItem<String>>((String value) {
                               return DropdownMenuItem<String>(
                                 value: value,
                                 child: Text(value),

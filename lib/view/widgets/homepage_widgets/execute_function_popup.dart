@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:orb/modal/operation_modal.dart';
 import 'package:orb/modal/tank_modal.dart';
 import 'package:orb/update/operation_provider.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +21,7 @@ class _ExecuteFunctionPopUpState extends State<ExecuteFunctionPopUp> {
   final TextEditingController operationIdController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   late String arithmeticExpression;
+
 
   @override
   void initState() {
@@ -43,13 +45,19 @@ class _ExecuteFunctionPopUpState extends State<ExecuteFunctionPopUp> {
                 ? Provider.of<OperationProvider>(context, listen: false)
                     .allOperations
                     .last
-                    .operationId +2
+                    .operationId +2 - (Provider.of<OperationProvider>(context,listen: false).allOperations.length - Provider.of<OperationProvider>(context,listen: false).allOperations.where((operation) => operation.operationFunctionName != "Daily Collection/Generation").toList().length)
                 : 0 +1)
             .toString();
   }
 
   @override
   Widget build(BuildContext context) {
+
+    List<Operation> allOperation = Provider.of<OperationProvider>(context).allOperations;
+    List<Operation> filteredOutDailyCollectionFromAllTankOperations = allOperation.where((operation) => operation.operationFunctionName != "Daily Collection/Generation").toList();
+    int totalDailyCollectionOperations = allOperation.length - filteredOutDailyCollectionFromAllTankOperations.length;
+
+
     return AlertDialog(
       contentPadding: const EdgeInsets.all(20.0),
       shape: RoundedRectangleBorder(
@@ -138,7 +146,7 @@ class _ExecuteFunctionPopUpState extends State<ExecuteFunctionPopUp> {
                   // Check if the user changed the operationId
                   int currentOperationId =
                       operationProvider.allOperations.isNotEmpty
-                          ? operationProvider.allOperations.last.operationId +1 +1
+                          ? operationProvider.allOperations.last.operationId +1 +1 - totalDailyCollectionOperations
                           : 0 +1;
                   int enteredOperationId =
                       int.parse(operationIdController.text);
@@ -188,7 +196,7 @@ class _ExecuteFunctionPopUpState extends State<ExecuteFunctionPopUp> {
                       targetTankName: arithmeticExpression == "transfer"
                           ? widget.functionName.replaceFirst("To ", "")
                           : null,
-                      insertIndex: enteredOperationId -1,
+                      insertIndex: enteredOperationId -1 + totalDailyCollectionOperations,
                       tankProvider: Provider.of<TankProvider>(context, listen: false),
                     );
                     Navigator.pop(context);
